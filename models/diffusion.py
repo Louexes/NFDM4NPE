@@ -309,7 +309,7 @@ class ScoreNetwork(nn.Module):
         self.sigma = None
         self.training = True
 
-    def forward(self, x, cond, sigma, uncond=False):
+    def forward(self, theta, cond, sigma, uncond=False):
         # Obtain the feature embedding for t
         if len(sigma.shape) == 0:
             sigma = einops.rearrange(sigma, ' -> 1')
@@ -318,8 +318,8 @@ class ScoreNetwork(nn.Module):
             sigma = sigma.unsqueeze(1)
         embed = self.embed(sigma)
         embed.squeeze_(1)
-        if embed.shape[0] != x.shape[0]:
-            embed = einops.repeat(embed, '1 d -> (1 b) d', b=x.shape[0])
+        if embed.shape[0] != theta.shape[0]:
+            embed = einops.repeat(embed, '1 d -> (1 b) d', b=theta.shape[0])
         # during training randomly mask out the cond
         # to train the conditional model with classifier-free guidance wen need
         # to 0 out some of the conditional during training with a desrired probability
@@ -330,11 +330,11 @@ class ScoreNetwork(nn.Module):
         if uncond:
             cond = torch.zeros_like(cond)  # cond
         if self.cond_conditional:
-            theta = torch.cat([theta, cond, embed], dim=-1)
+            theta_input = torch.cat([theta, cond, embed], dim=-1)
         else:
-            theta = torch.cat([theta, embed], dim=-1)
-        theta = self.layers(theta)
-        return theta  # / marginal_prob_std(t, self.sigma, self.device)[:, None]
+            theta_input = torch.cat([theta, embed], dim=-1)
+        theta_output = self.layers(theta_input)
+        return theta_output  # / marginal_prob_std(t, self.sigma, self.device)[:, None]
 
     def mask_cond(self, cond, force_mask=False):
         bs, d = cond.shape
