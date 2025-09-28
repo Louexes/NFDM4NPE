@@ -153,7 +153,7 @@ class NeuralDiffusionPosteriorSampler(torch.nn.Module):
         self.volatility = VolatilityNeural().to(device)  
 
         self.predictor = Predictor(
-            x_dim=X_dim,
+            theta_dim=theta_dim,
             hidden_dim=256,
             time_embed_dim=16,
             cond_dim=self.n_summaries,
@@ -235,7 +235,7 @@ class DiffusionPosteriorSampler(torch.nn.Module):
             pass
 
         self.decoder = ScoreNetwork(
-            x_dim=X_dim,
+            theta_dim=theta_dim,
             hidden_dim=256,
             time_embed_dim=16,
             cond_dim=self.n_summaries,
@@ -301,19 +301,19 @@ class NormalizingFlowPosteriorSampler(torch.nn.Module):
                                                          alpha=alpha)
 
     def forward(self, theta, X):
-        # first dimension of y is number of samples in the batch
+        # first dimension of X is number of samples in the batch
         # second dimension is number of data points per sample
 
         # get summary statistics
         s = self.summary(X) if self.use_encoder else X
-        z, sum_log_abs_det = self.decoder(x=theta, y=s)
+        z, sum_log_abs_det = self.decoder(theta=theta, X=s)
         return s, z, sum_log_abs_det
 
     def backward(self, z, X):
         with torch.no_grad():
             s = self.summary(X) if self.use_encoder else X
-            x = self.decoder.backward(z=z, y=s)
-        return x
+            theta = self.decoder.backward(z=z, X=s)
+        return theta
 
     @torch.no_grad()
     def sample(self, X):
@@ -323,7 +323,7 @@ class NormalizingFlowPosteriorSampler(torch.nn.Module):
         return z
 
     def loss(self, theta, X):
-        s, z, sum_log_abs_det = self(x=theta, y=X)
+        s, z, sum_log_abs_det = self(theta=theta, X=X)
         return 0.5 * (z * z).sum(dim=1) - sum_log_abs_det
 
     @torch.no_grad()
