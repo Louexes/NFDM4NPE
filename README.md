@@ -49,7 +49,7 @@ Contains experimental results comparing all three approaches:
 
 ### 📁 `resultsNFDMVolatilityZero/` - NFDM Advanced Results
 Contains results from Neural Diffusion experiments showing:
-- **`cos/NeuralDiffusionSigma/`** - NFDM with learnable sigma parameter
+- **`cos/NeuralDiffusionSigma/`** - NFDM results for Sum of Cosines trained with VolatilityZero() and flow matching loss
 
 ### Configuration Files
 - **`requirements.txt`** - Python dependencies (PyTorch, NumPy, Pandas, etc.)
