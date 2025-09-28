@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#SBATCH --partition=gpu_a100
+#SBATCH --gres=gpu:1 
+#SBATCH --cpus-per-task=9
+#SBATCH --gpus=1
+#SBATCH --job-name=dirichlet_nfdm
+#SBATCH --ntasks=1
+#SBATCH --time=4:59:00
+#SBATCH --mem=8000M
+#SBATCH --output=dirichlet_nfdm_%A.out
+
+module purge
+module load 2024
+
+# Activate environment
+source venv/bin/activate
+
+# Run your code
+python main.py --save_path result --dataset dirichlet_multinomial --device 0 --data_type=iid --epochs=2000 --model=NeuralDiffusion  --save_model --eval_interval=40  --lr_decay --n_run=1  --ecp_n_sim=100 --ecp_n_samples=200

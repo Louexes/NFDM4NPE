@@ -1,0 +1,2 @@
+seed,epochs,batch_size,n_batches,learning_rate,lr_decay,dataset,data_type,use_encoder,x_dim,y_dim,n_summaries,num_hidden_layer,total_params,trainable_params,eval_interval,n_cal,L,ecp_n_sim,ecp_n_samples
+1,100000,128,2,0.001,True,cos,iid,False,2,1,1,4,204082,204082,2500,1000,100,100,200
