@@ -39,14 +39,14 @@ def rand_log_normal(shape, device, loc=-1.2, scale=1.2, sigma_min=1e-3, sigma_ma
     return sigma
 
 # Predictor
-class Predictor(nn.Module):
+class PredictorSigma(nn.Module):
     """
     NFDM predictor in σ-space mirroring EDM-style's ScoreNetwork.
 
     θ̂(z, σ, X) = c_skip(σ) * z + c_out(σ) * Fψ([c_in(σ)*z, embed(c_noise(σ)), X])
 
     Args:
-        x_dim:        dimensionality of θ / z
+        theta_dim:    dimensionality of θ / z
         hidden_dim:   MLP width
         time_embed_dim: size of sinusoidal embedding vector
         cond_dim:     dimension of conditioning summary s(X)
@@ -146,12 +146,12 @@ class Predictor(nn.Module):
 
 # Volatility Modules
 
-class VolatilityZero(nn.Module):
+class VolatilityZeroSigma(nn.Module):
     """Volatility g(t) ≡ 0."""
     def forward(self, sigma: torch.Tensor) -> torch.Tensor:
         return torch.zeros_like(sigma)
 
-class VolatilityNeural(nn.Module):
+class VolatilityNeuralSigma(nn.Module):
     """
     Learnable volatility g(σ) > 0 with σ-embedding.
     """
@@ -168,7 +168,7 @@ class VolatilityNeural(nn.Module):
         return g  
 
 
-class VolatilityNeuralEmbedding(nn.Module):
+class VolatilityNeuralEmbeddingSigma(nn.Module):
     """
     Learnable volatility g(σ) > 0 with σ-embedding.
     """
@@ -190,7 +190,7 @@ class VolatilityNeuralEmbedding(nn.Module):
         g = self.sp(self.net(emb))
         return g  
 
-class VolatilityConst(nn.Module):
+class VolatilityConstSigma(nn.Module):
     """Constant volatility g(σ) = c > 0."""
     def __init__(self, value: float = 1.0):
         super().__init__()
@@ -206,7 +206,7 @@ class VolatilityConst(nn.Module):
 
 # Note this version does not use JVP to speed up inference.
 
-class AffineOT(nn.Module):
+class AffineOTSigma(nn.Module):
     """OT forward: α(σ) = (σ_max - σ)/(σ_max - σ_min)."""
     def __init__(self, sigma_min=2e-3, sigma_max=80.0):
         super().__init__()
@@ -236,9 +236,9 @@ class AffineOT(nn.Module):
 
 # Transform
 
-class TransformOT(nn.Module):
+class TransformOTSigma(nn.Module):
     """PF ops for AffineOT with explicit derivatives (no JVP)."""
-    def __init__(self, flow: AffineOT):
+    def __init__(self, flow: AffineOTSigma):
         super().__init__()
         self.flow = flow
 
@@ -275,7 +275,7 @@ class TransformOT(nn.Module):
 
 # NFDM Core Module
 
-class NeuralDiffusion(nn.Module):
+class NeuralDiffusionSigma(nn.Module):
     """
     σ-native NFDM forward pass 
     """
@@ -306,7 +306,6 @@ class NeuralDiffusion(nn.Module):
 
         loss = 0.5 * (f_drift - r_drift) ** 2 / g2 #loss = 0.5 * (f_drift - r_drift) ** 2 when using VolatilityZero()
         loss = loss.sum(dim=1) 
-
 
         
         # Collect stats

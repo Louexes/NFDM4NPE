@@ -13,7 +13,7 @@ from datasets.cos import sample_and_plot
 import os
 from datasets.plot_witch_hat_samples import plot_witch_hat_samples
 import wandb  # Add wandb import
-from models.nfdm_stats import NFDMStatsCollector
+from nfdm_stats import NFDMStatsCollector
 
 
 def trainer(data_loader, dataset, model, optimizer, scheduler, epochs, device, lr_decay, n_cal, L, seed, model_type, eval_interval, save_path, args, start_epoch=0, use_wandb=False, wandb_run=None):

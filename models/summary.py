@@ -136,18 +136,18 @@ class SummaryLastBiLSTMState(nn.Module):
         return out
 
 class BayesFlowEncoder(torch.nn.Module):
-    def __init__(self, y_dim, n_summaries, n_conv_filters=16, n_layers_LSTM=2):
+    def __init__(self, X_dim, n_summaries, n_conv_filters=16, n_layers_LSTM=2):
         super().__init__()
         self.encoder = torch.nn.Sequential(SwapLengthDepth(),
-                                BasicConv1D(y_dim, 4 * y_dim, kernel_size=1),
-                                Inception1DResidualBlock(in_dim=4 * y_dim, out_dim=n_summaries,
+                                BasicConv1D(X_dim, 4 * X_dim, kernel_size=1),
+                                Inception1DResidualBlock(in_dim=4 * X_dim, out_dim=n_summaries,
                                                          n_filters=n_conv_filters),
                                 SwapLengthDepth(),
                                 BiLSTMEncoder(n_summaries, n_summaries, n_layers_LSTM),
                                 SummaryLastBiLSTMState(dim_in=n_summaries)
                                 )
-    def forward(self,y):
-        return self.encoder(y)
+    def forward(self, X):
+        return self.encoder(X)
 
 
 

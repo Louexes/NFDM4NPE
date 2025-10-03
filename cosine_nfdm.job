@@ -6,7 +6,7 @@
 #SBATCH --gpus=1
 #SBATCH --job-name=cosine_nfdm
 #SBATCH --ntasks=1
-#SBATCH --time=12:59:00
+#SBATCH --time=17:59:00
 #SBATCH --mem=32000M
 #SBATCH --output=cosine_nfdm_%A.out
 
@@ -17,4 +17,4 @@ module load 2024
 source venv/bin/activate
 
 # Run your code
-python main.py --use_wandb --save_path results --dataset cos --device 0 --data_type=iid --epochs=100000 --model=NeuralDiffusionSigma --save_model --eval_interval=2500 --lr_deca --n_run=1 --ecp_n_sim=100 --ecp_n_samples=200
+python main.py --use_wandb --save_path resultsNFDM_t --dataset cos --device 0 --data_type=iid --epochs=100000 --model=NeuralDiffusion --save_model --eval_interval=2500 --lr_deca --n_run=1 --ecp_n_sim=100 --ecp_n_samples=200
